@@ -1,0 +1,95 @@
+Name: golang_todolist
+Repo: Hank220902/golang_todolist
+Version: main
+Dest: D:/practice/golang_todolist
+Module: todolist
+DisableInlineCommands: false
+DisableNpmInstall: false
+NpmBuildScriptName: build
+Watcher:
+    Disable: false
+    Backend:
+        - .go
+        - .mod
+        - .yml
+        - .toml
+        - .tml
+        - .ini
+        - .proto
+    Frontend:
+        - .html
+        - .htm
+        - .svelte
+        - .md
+        - .js
+        - .ts
+        - .jsx
+        - .tsx
+        - .css
+        - .scss
+        - .less
+        - .json
+        - .proto
+    IgnoreDirs:
+        - .github
+        - .github/*
+        - uploads
+        - uploads/*
+LiveReload:
+    Disable: false
+    Port: 35729
+Files:
+    - .git
+    - .git/COMMIT_EDITMSG
+    - .git/FETCH_HEAD
+    - .git/HEAD
+    - .git/config
+    - .git/description
+    - .git/hooks
+    - .git/hooks/applypatch-msg.sample
+    - .git/hooks/commit-msg.sample
+    - .git/hooks/fsmonitor-watchman.sample
+    - .git/hooks/post-update.sample
+    - .git/hooks/pre-applypatch.sample
+    - .git/hooks/pre-commit.sample
+    - .git/hooks/pre-merge-commit.sample
+    - .git/hooks/pre-push.sample
+    - .git/hooks/pre-rebase.sample
+    - .git/hooks/pre-receive.sample
+    - .git/hooks/prepare-commit-msg.sample
+    - .git/hooks/push-to-checkout.sample
+    - .git/hooks/update.sample
+    - .git/index
+    - .git/info
+    - .git/info/exclude
+    - .git/logs
+    - .git/logs/HEAD
+    - .git/logs/refs
+    - .git/logs/refs/heads
+    - .git/logs/refs/heads/develop
+    - .git/logs/refs/heads/main
+    - .git/logs/refs/remotes
+    - .git/logs/refs/remotes/origin
+    - .git/logs/refs/remotes/origin/main
+    - .git/objects
+    - .git/objects/5b
+    - .git/objects/5b/bb1d5620f7c1fffdc787c159c9995d1baa31a1
+    - .git/objects/e6
+    - .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+    - .git/objects/f9
+    - .git/objects/f9/3e3a1a1525fb5b91020da86e44810c87a2d7bc
+    - .git/objects/info
+    - .git/objects/pack
+    - .git/refs
+    - .git/refs/heads
+    - .git/refs/heads/develop
+    - .git/refs/heads/main
+    - .git/refs/remotes
+    - .git/refs/remotes/origin
+    - .git/refs/remotes/origin/main
+    - .git/refs/tags
+    - README.md
+    - go.mod
+    - go.sum
+BuildFiles: []
+MD5PackageJSON: []
