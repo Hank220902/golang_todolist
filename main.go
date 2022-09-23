@@ -1,31 +1,26 @@
 // file: main.go
 package main
 
-import "github.com/kataras/iris/v12"
+import (
+    "todolist/controllers"
+    "todolist/database"
+	"github.com/kataras/iris/v12")
 
 func main() {
+    database.Database()
     app := iris.New()
-    // Load all templates from the "./views" folder
-    // where extension is ".html" and parse them
-    // using the standard `html/template` package.
-    app.RegisterView(iris.HTML("./views", ".html"))
-
-    // Method:    GET
-    // Resource:  http://localhost:8080
     app.Get("/", func(ctx iris.Context) {
-        // Bind: {{.message}} with "Hello world!"
-        ctx.ViewData("message", "Hello world!")
-        // Render template file: ./views/hello.html
-        ctx.View("hello.html")
-    })
-
-    // Method:    GET
-    // Resource:  http://localhost:8080/user/42
-    app.Get("/user/{id:int64}", func(ctx iris.Context) {
-        userID, _ := ctx.Params().GetInt64("id")
-        ctx.Writef("User ID: %d", userID)
-    })
-
-    // Start the server using a network address.
+        ctx.JSON("Hello World")
+      })
+    app.Get("/todoList", controllers.CreateToDoList)
+    // app.Post("/todoList", posting)
+    // app.Put("/todoList", putting)
+    // app.Delete("/todoList", deleting)
     app.Listen(":8080")
+
+
 }
+
+
+
+
