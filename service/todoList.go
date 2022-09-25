@@ -1,26 +1,26 @@
 package service
 
 import (
-    "context"
+	"fmt"
+	"log"
+	"todolist/database"
 	"todolist/model"
-    "todolist/database"
-    "fmt"
-    "log"
+
+	"github.com/kataras/iris/v12"
 )
 
+func CreateToDoList(ctx iris.Context) model.Sunshareboy {
 
-func CreateToDoList() string {
-    
-    var ctx = context.TODO()
-    // var sunshareboy model.Sunshareboy
+	//var ctx = context.TODO()
+	// var sunshareboy model.Sunshareboy
+	//tasks := new(model.Sunshareboy) 
 	wanger := model.Sunshareboy{"wanger", 24, "北京"}
 	insertOne, err := database.Collection.InsertOne(ctx, wanger)
-    
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Inserted a Single Document: ", insertOne.InsertedID)
-    return "Inserted a Single Document: "
+	return wanger
 
 }

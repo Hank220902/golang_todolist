@@ -28,7 +28,7 @@ func Database() {
 		log.Fatal(err)
 	}
 	fmt.Println("Connected to MongoDB!")
-	defer client.Disconnect(ctx)
+	//defer client.Disconnect(ctx)
 
 	databases, err := client.ListDatabaseNames(ctx, bson.M{})
 	if err != nil {

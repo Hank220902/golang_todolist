@@ -6,13 +6,17 @@ import (
     "todolist/database"
 	"github.com/kataras/iris/v12")
 
-func main() {
+func init() {
     database.Database()
+}
+    
+func main() {
+    
     app := iris.New()
     app.Get("/", func(ctx iris.Context) {
         ctx.JSON("Hello World")
       })
-    app.Get("/todoList", controllers.CreateToDoList)
+    app.Post("/todoList", controllers.CreateToDoList)
     // app.Post("/todoList", posting)
     // app.Put("/todoList", putting)
     // app.Delete("/todoList", deleting)

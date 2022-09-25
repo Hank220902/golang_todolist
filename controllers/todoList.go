@@ -9,9 +9,9 @@ import (
 
 
 func CreateToDoList(ctx iris.Context) {
-	fmt.Println("123")
 	// service.CreateToDoList()
-	fmt.Println(service.CreateToDoList())
-	ctx.JSON(service.CreateToDoList())
+	hello :=service.CreateToDoList(ctx)
+	fmt.Println(hello)
+	ctx.JSON(hello)
 	
 }
