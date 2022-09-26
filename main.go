@@ -7,7 +7,7 @@ import (
 	"github.com/kataras/iris/v12")
 
 func init() {
-    database.Database()
+    database.Connect()
 }
     
 func main() {
@@ -20,7 +20,7 @@ func main() {
     // app.Post("/todoList", posting)
     // app.Put("/todoList", putting)
     // app.Delete("/todoList", deleting)
-    app.Listen(":8080")
+    app.Listen(":3000")
 
 
 }

@@ -14,7 +14,7 @@ import (
 var Collection *mongo.Collection
 
 
-func Database() {
+func Connect() {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	var ctx = context.TODO()
 	// Connect to MongoDB
