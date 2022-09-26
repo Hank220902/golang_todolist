@@ -19,8 +19,8 @@ func main() {
     app.Get("/", func(ctx iris.Context) {
         ctx.JSON("Hello World")
       })
-    app.Get("/todoList", controllers.CreateToDoList)
-    app.Post("/todoList", controllers.GetToDoList)
+    app.Get("/todoList", controllers.GetToDoList)
+    app.Post("/todoList", controllers.CreateToDoList)
     app.Get("/ManytodoList", controllers.GetManyToDoList)
     app.Put("/todoList", controllers.UpdateToDoList)
     app.Delete("/todoList", controllers.DeleteToDoList)

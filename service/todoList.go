@@ -11,10 +11,7 @@ import (
 )
 
 func CreateToDoList(ctx iris.Context) model.Sunshareboy {
-
-	//var ctx = context.TODO()
-	// var sunshareboy model.Sunshareboy
-	//tasks := new(model.Sunshareboy)
+		
 	wanger := model.Sunshareboy{"wanger", 24, "北京"}
 	insertOne, err := database.Collection.InsertOne(ctx, wanger)
 	if err != nil {
