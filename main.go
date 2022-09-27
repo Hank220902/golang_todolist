@@ -21,7 +21,7 @@ func main() {
       })
     app.Get("/todoList", controllers.GetToDoList)
     app.Post("/todoList", controllers.CreateToDoList)
-    app.Get("/ManytodoList", controllers.GetManyToDoList)
+    app.Get("/manytTodoList", controllers.GetManyToDoList)
     app.Put("/todoList", controllers.UpdateToDoList)
     app.Delete("/todoList", controllers.DeleteToDoList)
     app.Listen(":3000")
