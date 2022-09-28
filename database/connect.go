@@ -10,8 +10,8 @@ import (
 	//"time"
 )
 
-
-var Collection *mongo.Collection
+var TodolistCollection *mongo.Collection
+var UserCollection *mongo.Collection
 
 
 func Connect() {
@@ -38,7 +38,8 @@ func Connect() {
 
 
 
-	Collection = client.Database("test").Collection("sunshare")
+	TodolistCollection = client.Database("todolist").Collection("todolists")
+	UserCollection = client.Database("todolist").Collection("users")
 	fmt.Println("Collection instance created!")
 
 }

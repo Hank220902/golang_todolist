@@ -6,7 +6,7 @@ import (
 	"todolist/database"
 
 	"github.com/kataras/iris/v12"
-	//"github.com/kataras/iris/v12/context"
+
 )
 
 func init() {
@@ -19,11 +19,11 @@ func main() {
     app.Get("/", func(ctx iris.Context) {
         ctx.JSON("Hello World")
       })
-    app.Get("/todoList", controllers.GetToDoList)
-    app.Post("/todoList", controllers.CreateToDoList)
-    app.Get("/manytTodoList", controllers.GetManyToDoList)
-    app.Put("/todoList", controllers.UpdateToDoList)
-    app.Delete("/todoList", controllers.DeleteToDoList)
+    app.Get("/todolist", controllers.GetToDoList)
+    app.Post("/todolist", controllers.CreateToDoList)
+    app.Get("/manytodolist", controllers.GetManyToDoList)
+    app.Put("/todolist", controllers.UpdateToDoList)
+    app.Delete("/todolist", controllers.DeleteToDoList)
     app.Listen(":3000")
 
 

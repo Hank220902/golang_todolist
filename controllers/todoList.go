@@ -10,31 +10,31 @@ import (
 func CreateToDoList(ctx iris.Context) {
 	// service.CreateToDoList()
 
-	hello := service.CreateToDoList(ctx)
-	fmt.Println(hello)
-	ctx.JSON(hello)
+	result := service.CreateToDoList(ctx)
+	fmt.Println(result)
+	ctx.JSON(result)
 
 }
 
 func GetToDoList(ctx iris.Context) {
-	hello := service.GetOneToDoList(ctx)
-	fmt.Println(hello)
-	ctx.JSON(hello)
+	result := service.GetOneToDoList(ctx)
+	fmt.Println(result)
+	ctx.JSON(result)
 }
 
 func GetManyToDoList(ctx iris.Context) {
-	hello := service.GetManyToDoList(ctx)
-	fmt.Println(hello)
-	ctx.JSON(hello)
+	result := service.GetManyToDoList(ctx)
+	fmt.Println(result)
+	ctx.JSON(result)
 }
 
 func UpdateToDoList(ctx iris.Context) {
-	service.UpdateToDoList(ctx)
-	// hello := service.UpdateToDoList(ctx)
-	// fmt.Println()
-	// ctx.JSON(hello)
+	result := service.UpdateToDoList(ctx)
+	fmt.Println()
+	ctx.JSON(result)
 }
 
 func DeleteToDoList(ctx iris.Context) {
-	service.DeleteToDoList(ctx)
+	result := service.DeleteToDoList(ctx)
+	ctx.JSON(result)
 }
