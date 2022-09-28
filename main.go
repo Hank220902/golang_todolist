@@ -16,7 +16,8 @@ func main() {
     
     app := iris.New()
     
-    routes.Route(app)
+    routes.TodoList(app)
+    routes.User(app)
     app.Listen(":3000")
 
 

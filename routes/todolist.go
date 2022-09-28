@@ -8,7 +8,7 @@ import (
 
 )
 
-func Route (app *iris.Application){
+func TodoList(app *iris.Application){
 	app.Get("/", func(ctx iris.Context) {
         ctx.JSON("Hello World")
       })

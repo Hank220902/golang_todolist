@@ -1,13 +1,10 @@
 package service
 
 import (
-	//"encoding/json"
 	"fmt"
-	//"io/ioutil"
 	"log"
 	"todolist/database"
-	"todolist/model"
-
+	"todolist/models"
 	"time"
 	"strconv"
 	"github.com/davecgh/go-spew/spew"
@@ -19,7 +16,7 @@ import (
 func CreateToDoList(ctx iris.Context) string {
 
 	//需要用一个结构体来｀存放数据 并且结构体当中要有tag标签
-	var TodoList model.TodoList
+	var TodoList models.TodoList
 
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
@@ -28,7 +25,7 @@ func CreateToDoList(ctx iris.Context) string {
 	fmt.Println(TodoList)
 	TodoList.CreateTime = time.Now()
 
-	result := model.TodoList{TodoList.Matter, TodoList.CreateTime, TodoList.EndTime, TodoList.FinishedCondition, TodoList.Status, TodoList.Email}
+	result := models.TodoList{TodoList.Matter, TodoList.CreateTime, TodoList.EndTime, TodoList.FinishedCondition, TodoList.Status, TodoList.Email}
 	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
 		log.Fatal(err)
@@ -39,8 +36,8 @@ func CreateToDoList(ctx iris.Context) string {
 
 }
 
-func GetOneToDoList(ctx iris.Context) model.TodoList {
-	var result model.TodoList
+func GetOneToDoList(ctx iris.Context) models.TodoList {
+	var result models.TodoList
 	matter := ctx.Request().URL.Query().Get("matter")
 
 	filter := bson.D{{"matter", matter}}
@@ -52,17 +49,17 @@ func GetOneToDoList(ctx iris.Context) model.TodoList {
 	return result
 }
 
-func GetManyToDoList(ctx iris.Context) []*model.TodoList {
+func GetManyToDoList(ctx iris.Context) []*models.TodoList {
 	findOptions := options.Find()
 	findOptions.SetLimit(10)
-	var results []*model.TodoList
+	var results []*models.TodoList
 	cur, err := database.TodolistCollection.Find(ctx, bson.D{{}}, findOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for cur.Next(ctx) {
 		//定義一個文件，將單個文件解碼為result
-		var result model.TodoList
+		var result models.TodoList
 		err := cur.Decode(&result)
 		if err != nil {
 			log.Fatal(err)
@@ -83,7 +80,7 @@ func GetManyToDoList(ctx iris.Context) []*model.TodoList {
 }
 
 func UpdateToDoList(ctx iris.Context) string {
-	var TodoList model.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
+	var TodoList models.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
 	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
@@ -113,7 +110,7 @@ func UpdateToDoList(ctx iris.Context) string {
 }
 
 func DeleteToDoList(ctx iris.Context) (string) {
-	var TodoList model.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
+	var TodoList models.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
 	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
