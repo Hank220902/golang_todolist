@@ -8,11 +8,14 @@ import (
 )
 
 func Register(ctx iris.Context){
-	
-	fmt.Println(service.Register(ctx))
+	result :=service.Register(ctx)
+	fmt.Println(result)
+	ctx.JSON(result)
 }
 
 func Login(ctx iris.Context){
-	service.Login()
-	fmt.Println("login")
+	
+	result := service.Login(ctx)
+	fmt.Println(result)
+	ctx.JSON(result)
 }

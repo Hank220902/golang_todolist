@@ -3,10 +3,11 @@ package service
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 	"todolist/database"
 	"todolist/models"
-	"time"
-	"strconv"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,7 +26,14 @@ func CreateToDoList(ctx iris.Context) string {
 	fmt.Println(TodoList)
 	TodoList.CreateTime = time.Now()
 
-	result := models.TodoList{TodoList.Matter, TodoList.CreateTime, TodoList.EndTime, TodoList.FinishedCondition, TodoList.Status, TodoList.Email}
+	result := models.TodoList{
+		Matter:            TodoList.Matter,
+		CreateTime:        TodoList.CreateTime,
+		EndTime:           TodoList.EndTime,
+		FinishedCondition: TodoList.FinishedCondition,
+		Status:            TodoList.Status,
+		Email:             TodoList.Email,
+	}
 	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +48,7 @@ func GetOneToDoList(ctx iris.Context) models.TodoList {
 	var result models.TodoList
 	matter := ctx.Request().URL.Query().Get("matter")
 
-	filter := bson.D{{"matter", matter}}
+	filter := bson.D{{Key: "matter", Value: matter}}
 	err := database.TodolistCollection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -85,12 +93,12 @@ func UpdateToDoList(ctx iris.Context) string {
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
-	filter := bson.D{{"matter", TodoList.Matter}}
+	filter := bson.D{{Key: "matter", Value: TodoList.Matter}}
 	// 如果過濾的文件不存在，則插入新的文件
 	opts := options.Update().SetUpsert(true)
 	update := bson.D{
-		{"$set", bson.D{
-			{"finishedCondition", TodoList.FinishedCondition}},
+		{Key: "$set", Value: bson.D{
+			{Key: "finishedCondition", Value: TodoList.FinishedCondition}},
 		}}
 	result, err := database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
@@ -99,7 +107,7 @@ func UpdateToDoList(ctx iris.Context) string {
 	}
 	if result.MatchedCount != 0 {
 		fmt.Printf("Matched %v documents and updated %v documents.\n", result.MatchedCount, result.ModifiedCount)
-		return "修改成功"		
+		return "修改成功"
 	}
 	if result.UpsertedCount != 0 {
 		fmt.Printf("inserted a new document with ID %v\n", result.UpsertedID)
@@ -109,7 +117,7 @@ func UpdateToDoList(ctx iris.Context) string {
 	return "未知"
 }
 
-func DeleteToDoList(ctx iris.Context) (string) {
+func DeleteToDoList(ctx iris.Context) string {
 	var TodoList models.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
 	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
 	if err := ctx.ReadJSON(&TodoList); err != nil {
@@ -117,17 +125,14 @@ func DeleteToDoList(ctx iris.Context) (string) {
 	}
 	fmt.Println(TodoList)
 
-	fmt.Println(TodoList.FinishedCondition)
 	deleteResult, err := database.TodolistCollection.DeleteMany(ctx, bson.M{"finishedCondition": TodoList.FinishedCondition})
 	if err != nil {
 		log.Fatal(err)
 	}
-	result := strconv.FormatInt(deleteResult.DeletedCount,10)
+	result := strconv.FormatInt(deleteResult.DeletedCount, 10)
 
-	
 	fmt.Printf("Deleted %v documents in the trainers collection\n", deleteResult.DeletedCount)
-	result = "刪除"+result+"筆資料"
+	result = "刪除" + result + "筆資料"
 	return result
-
 
 }
