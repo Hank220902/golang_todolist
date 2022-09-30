@@ -10,13 +10,13 @@ import (
 
 var mySecret = []byte("secret")
 
-var j = jwt.New(jwt.Config{
+var J = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 		return mySecret, nil
 	},
 	Expiration: true,
 
-	Extractor: jwt.FromParameter("token"),
+	Extractor: jwt.FromAuthHeader,
 
 	SigningMethod: jwt.SigningMethodHS256,
 })
@@ -26,41 +26,30 @@ func GetTokenHandler(email string) string {
 	now := time.Now()
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
-		"iat": now.Unix(),
-		"exp": now.Add(15 * time.Minute).Unix(),
+		"iat":   now.Unix(),
+		"exp":   now.Add(15 * time.Minute).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, _ := token.SignedString(mySecret)
 	return tokenString
-	
+
 }
 
-func MyAuthenticatedHandler(ctx iris.Context) {
-	if err := j.CheckJWT(ctx); err != nil {
-		j.Config.ErrorHandler(ctx, err)
-		return
+func MyAuthenticatedHandler(ctx iris.Context) string {
+	if err := J.CheckJWT(ctx); err != nil {
+		J.Config.ErrorHandler(ctx, err)
+
 	}
 
 	token := ctx.Values().Get("jwt").(*jwt.Token)
 
-	ctx.Writef("This is an authenticated request\n\n")
-	// ctx.Writef("Claim content:\n")
+	tokenResult := token.Claims.(jwt.MapClaims)["email"].(string)
 
-	foobar := token.Claims.(jwt.MapClaims)
-	ctx.Writef("foo=%s\n", foobar["foo"])
+	ctx.Next()
 	// for key, value := range foobar {
 	// 	ctx.Writef("%s = %s", key, value)
 	// }
+
+	return tokenResult
 }
-
-// func main() {
-// 	app := iris.New()
-
-// 	app.Get("/", getTokenHandler)
-// 	app.Get("/protected", myAuthenticatedHandler)
-
-// 	// j.CheckJWT(Context) error can be also used inside handlers.
-
-// 	app.Listen(":8080")
-// }

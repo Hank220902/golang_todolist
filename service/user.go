@@ -1,12 +1,11 @@
 package service
 
 import (
-	"todolist/middleware"
 	"fmt"
 	"log"
 	"todolist/database"
 	"todolist/models"
-
+	"todolist/middleware"
 	// "github.com/davecgh/go-spew/spew"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,7 +29,7 @@ func Register(ctx iris.Context) string {
 
 	result := models.User{
 		Name:     user.Name,
-		Password: user.Password,
+		Password: hashStr,
 		Email:    user.Email,
 	}
 	insertOne, err := database.UserCollection.InsertOne(ctx, result)
@@ -56,29 +55,16 @@ func Login(ctx iris.Context) string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(email)
 
 	token := middleware.GetTokenHandler(email)
-
-	fmt.Println(resultLongin)
-	if password==resultLongin.Password{
+	check := ComparePasswords(resultLongin.Password, password)
+	if !check {
+		fmt.Println("pw wrong")
+		return "帳號或密碼錯誤"
+	} else {
+		fmt.Println("pw ok")
 		return token
-	}else{
-		return "密碼錯誤"
 	}
-	//fmt.Printf("Found a single document: %+v\n", login.Password)
-	// hashStr, err := HashAndSalt(password)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(hashStr)
-
-	// check := ComparePasswords(resultLongin.Password, password)
-	// if !check {
-	// 	fmt.Println("pw wrong")
-	// 	return "帳號或密碼錯誤"
-	// } else {
-	// 	fmt.Println("pw ok")
-	// 	return "登入成功"
-	// }
 
 }

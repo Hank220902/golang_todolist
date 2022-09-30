@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 	"todolist/database"
+	"todolist/middleware"
 	"todolist/models"
 
 	"github.com/davecgh/go-spew/spew"
@@ -15,7 +16,7 @@ import (
 )
 
 func CreateToDoList(ctx iris.Context) string {
-
+	email := middleware.MyAuthenticatedHandler(ctx)
 	//需要用一个结构体来｀存放数据 并且结构体当中要有tag标签
 	var TodoList models.TodoList
 
@@ -32,7 +33,7 @@ func CreateToDoList(ctx iris.Context) string {
 		EndTime:           TodoList.EndTime,
 		FinishedCondition: TodoList.FinishedCondition,
 		Status:            TodoList.Status,
-		Email:             TodoList.Email,
+		Email:             email,
 	}
 	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
@@ -44,11 +45,12 @@ func CreateToDoList(ctx iris.Context) string {
 
 }
 
-func GetOneToDoList(ctx iris.Context) models.TodoList {
-	var result models.TodoList
-	matter := ctx.Request().URL.Query().Get("matter")
-
-	filter := bson.D{{Key: "matter", Value: matter}}
+func GetOneToDoList(ctx iris.Context) models.HaveIDTodoList {
+	var result models.HaveIDTodoList
+	//matter := ctx.Request().URL.Query().Get("matter")
+	email := middleware.MyAuthenticatedHandler(ctx)
+	fmt.Println(email)
+	filter := bson.D{{Key: "email", Value: email}}
 	err := database.TodolistCollection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
@@ -57,17 +59,20 @@ func GetOneToDoList(ctx iris.Context) models.TodoList {
 	return result
 }
 
-func GetManyToDoList(ctx iris.Context) []*models.TodoList {
+func GetManyToDoList(ctx iris.Context) []*models.HaveIDTodoList {
 	findOptions := options.Find()
 	findOptions.SetLimit(10)
-	var results []*models.TodoList
-	cur, err := database.TodolistCollection.Find(ctx, bson.D{{}}, findOptions)
+	var results []*models.HaveIDTodoList
+	email := middleware.MyAuthenticatedHandler(ctx)
+	filter := bson.D{{Key: "email", Value: email}}
+
+	cur, err := database.TodolistCollection.Find(ctx, filter, findOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for cur.Next(ctx) {
 		//定義一個文件，將單個文件解碼為result
-		var result models.TodoList
+		var result models.HaveIDTodoList
 		err := cur.Decode(&result)
 		if err != nil {
 			log.Fatal(err)
@@ -88,12 +93,12 @@ func GetManyToDoList(ctx iris.Context) []*models.TodoList {
 }
 
 func UpdateToDoList(ctx iris.Context) string {
-	var TodoList models.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
+	var TodoList models.HaveIDTodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
 	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
-	filter := bson.D{{Key: "matter", Value: TodoList.Matter}}
+	filter := bson.D{{Key: "_id", Value: TodoList.ID}}
 	// 如果過濾的文件不存在，則插入新的文件
 	opts := options.Update().SetUpsert(true)
 	update := bson.D{
@@ -114,7 +119,7 @@ func UpdateToDoList(ctx iris.Context) string {
 		return "修改成功"
 	}
 	fmt.Println(result)
-	return "未知"
+	return "修改失敗"
 }
 
 func DeleteToDoList(ctx iris.Context) string {

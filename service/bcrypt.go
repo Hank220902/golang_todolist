@@ -4,10 +4,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-//加密
-func HashAndSalt(pwdStr string) (pwdHash string,err error) {
+// 加密
+func HashAndSalt(pwdStr string) (pwdHash string, err error) {
 	pwd := []byte(pwdStr)
-	hash, err := bcrypt.GenerateFromPassword(pwd, 14)
+	hash, err := bcrypt.GenerateFromPassword(pwd, 10)
 	if err != nil {
 		return
 	}
@@ -15,11 +15,11 @@ func HashAndSalt(pwdStr string) (pwdHash string,err error) {
 	return
 }
 
-//驗證
+// 驗證
 func ComparePasswords(hashedPwd string, plainPwd string) bool {
 	byteHash := []byte(hashedPwd)
 	bytePwd := []byte(plainPwd)
 	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
-	return err == nil 
-		
+	return err == nil
+
 }
