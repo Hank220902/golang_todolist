@@ -12,6 +12,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -24,16 +25,15 @@ func CreateToDoList(ctx iris.Context) string {
 		panic(err.Error())
 	}
 
-	fmt.Println(TodoList)
 	TodoList.CreateTime = time.Now()
 
 	result := models.TodoList{
 		Matter:            TodoList.Matter,
-		CreateTime:        TodoList.CreateTime,
 		EndTime:           TodoList.EndTime,
 		FinishedCondition: TodoList.FinishedCondition,
 		Status:            TodoList.Status,
 		Email:             email,
+		CreateTime:        TodoList.CreateTime,
 	}
 	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
@@ -98,12 +98,18 @@ func UpdateToDoList(ctx iris.Context) string {
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
-	filter := bson.D{{Key: "_id", Value: TodoList.ID}}
+	id, _ := primitive.ObjectIDFromHex(TodoList.ID)
+
+	filter := bson.D{{Key: "_id",Value:id}}
+
 	// 如果過濾的文件不存在，則插入新的文件
 	opts := options.Update().SetUpsert(true)
 	update := bson.D{
 		{Key: "$set", Value: bson.D{
-			{Key: "finishedCondition", Value: TodoList.FinishedCondition}},
+			{Key: "finishedCondition", Value: TodoList.FinishedCondition},
+			{Key: "note", Value: TodoList.Note},
+			{Key: "updateAt",Value:time.Now()},
+		},
 		}}
 	result, err := database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
@@ -123,14 +129,17 @@ func UpdateToDoList(ctx iris.Context) string {
 }
 
 func DeleteToDoList(ctx iris.Context) string {
-	var TodoList models.TodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
+	var TodoList models.HaveIDTodoList//一个结构体来存放数据 并且结构体当中要有tag标签
 	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
 	fmt.Println(TodoList)
+	id, _ := primitive.ObjectIDFromHex(TodoList.ID)
 
-	deleteResult, err := database.TodolistCollection.DeleteMany(ctx, bson.M{"finishedCondition": TodoList.FinishedCondition})
+	filter := bson.D{{Key: "_id",Value:id}}
+
+	deleteResult, err := database.TodolistCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}

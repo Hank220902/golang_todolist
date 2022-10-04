@@ -15,7 +15,7 @@ var UserCollection *mongo.Collection
 
 
 func Connect() {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://Hank220902:asd8836259@cluster0.9mt5wf9.mongodb.net/?retryWrites=true&w=majority")
 	var ctx = context.TODO()
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, clientOptions)
