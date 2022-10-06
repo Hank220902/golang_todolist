@@ -4,7 +4,7 @@ import "time"
 
 type TodoList struct {
 	Matter            string    `json:"matter" bson:"matter"`
-	EndTime           time.Time `json:"endtTime" bson:"endtTime"`
+	EndTime           time.Time `json:"endTime" bson:"endTime"`
 	FinishedCondition string    `json:"finishedCondition" bson:"finishedCondition"`
 	Status            string    `json:"status" bson:"status"`
 	Email             string    `json:"email" bson:"email"`

@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"context"
+	"fmt"
 	"time"
 
-	"github.com/kataras/iris/v12"
+	"todolist/database"
 
 	"github.com/iris-contrib/middleware/jwt"
+	"github.com/kataras/iris/v12"
 )
 
 var mySecret = []byte("secret")
@@ -23,20 +26,42 @@ var J = jwt.New(jwt.Config{
 
 // generate token to use.
 func GetTokenHandler(email string) string {
+	var Redis = database.Redis()
+	ctx := context.Background()
 	now := time.Now()
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"iat":   now.Unix(),
-		"exp":   now.Add(15 * time.Minute).Unix(),
+		"exp":   now.Add(1440 * time.Minute).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, _ := token.SignedString(mySecret)
+
+	n, err := Redis.Exists(ctx, email).Result()
+	if err != nil {
+		panic(err)
+	}
+	if n > 0 {
+		n := Redis.Del(ctx, email)
+		fmt.Println(n.Result())
+		err := Redis.Set(ctx, email, tokenString, 15*time.Minute).Err()
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		err := Redis.Set(ctx, email, tokenString, 15*time.Minute).Err()
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return tokenString
 
 }
 
 func MyAuthenticatedHandler(ctx iris.Context) string {
+	var Redis = database.Redis()
 	if err := J.CheckJWT(ctx); err != nil {
 		J.Config.ErrorHandler(ctx, err)
 
@@ -45,11 +70,16 @@ func MyAuthenticatedHandler(ctx iris.Context) string {
 	token := ctx.Values().Get("jwt").(*jwt.Token)
 
 	tokenResult := token.Claims.(jwt.MapClaims)["email"].(string)
+	n, err := Redis.Exists(ctx, tokenResult).Result()
+	if err != nil {
+		panic(err)
+	}
+	if n > 0 {
+		ctx.Next()
 
-	ctx.Next()
-	// for key, value := range foobar {
-	// 	ctx.Writef("%s = %s", key, value)
-	// }
+		return tokenResult
+	} else {
+		return "token not found"
+	}
 
-	return tokenResult
 }

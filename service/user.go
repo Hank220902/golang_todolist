@@ -42,6 +42,7 @@ func Register(ctx iris.Context) string {
 }
 
 func Login(ctx iris.Context) string {
+
 	var reqLogin models.Login
 	if err := ctx.ReadJSON(&reqLogin); err != nil {
 		panic(err.Error())
@@ -60,10 +61,8 @@ func Login(ctx iris.Context) string {
 	token := middleware.GetTokenHandler(email)
 	check := ComparePasswords(resultLongin.Password, password)
 	if !check {
-		fmt.Println("pw wrong")
 		return "帳號或密碼錯誤"
 	} else {
-		fmt.Println("pw ok")
 		return token
 	}
 

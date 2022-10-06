@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/davecgh/go-spew v1.1.1
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/iris-contrib/middleware/jwt v0.0.0-20220921193907-d3e7dfb17c8f
 	github.com/kataras/iris/v12 v12.2.0-beta5
 	go.mongodb.org/mongo-driver v1.10.2
@@ -22,7 +23,6 @@ require (
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/flosch/pongo2/v4 v4.0.2 // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect

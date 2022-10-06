@@ -18,22 +18,26 @@ import (
 
 func CreateToDoList(ctx iris.Context) string {
 	email := middleware.MyAuthenticatedHandler(ctx)
-	//需要用一个结构体来｀存放数据 并且结构体当中要有tag标签
+	if email == "token not found" {
+		return "token not found"
+	}
+
 	var TodoList models.TodoList
 
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
 
-	TodoList.CreateTime = time.Now()
-
+	status := ""
+	createTime := time.Now()
+	fmt.Println(TodoList.EndTime)
 	result := models.TodoList{
 		Matter:            TodoList.Matter,
 		EndTime:           TodoList.EndTime,
 		FinishedCondition: TodoList.FinishedCondition,
-		Status:            TodoList.Status,
+		Status:            status,
 		Email:             email,
-		CreateTime:        TodoList.CreateTime,
+		CreateTime:        createTime,
 	}
 	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
@@ -41,14 +45,17 @@ func CreateToDoList(ctx iris.Context) string {
 	}
 
 	fmt.Println("Inserted a Single Document: ", insertOne.InsertedID)
-	return "新增成功"
+	return "success"
 
 }
 
-func GetOneToDoList(ctx iris.Context) models.HaveIDTodoList {
+func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, string) {
 	var result models.HaveIDTodoList
-	//matter := ctx.Request().URL.Query().Get("matter")
+
 	email := middleware.MyAuthenticatedHandler(ctx)
+	if email == "token not found" {
+		return result, "token not found"
+	}
 	fmt.Println(email)
 	filter := bson.D{{Key: "email", Value: email}}
 	err := database.TodolistCollection.FindOne(ctx, filter).Decode(&result)
@@ -56,88 +63,102 @@ func GetOneToDoList(ctx iris.Context) models.HaveIDTodoList {
 		log.Fatal(err)
 	}
 	fmt.Printf("Found a single document: %+v\n", result)
-	return result
+	return result, "success"
 }
 
-func GetManyToDoList(ctx iris.Context) []*models.HaveIDTodoList {
-	findOptions := options.Find()
-	findOptions.SetLimit(10)
+func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, string) {
+
 	var results []*models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
+	if email == "token not found" {
+		return results, "token not found"
+	}
+	updateStatus(ctx,email)
 	filter := bson.D{{Key: "email", Value: email}}
 
-	cur, err := database.TodolistCollection.Find(ctx, filter, findOptions)
+	cur, err := database.TodolistCollection.Find(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for cur.Next(ctx) {
-		//定義一個文件，將單個文件解碼為result
+
 		var result models.HaveIDTodoList
 		err := cur.Decode(&result)
+
 		if err != nil {
 			log.Fatal(err)
 		}
+		zone := time.FixedZone("", +8*60*60)
+		result.CreateTime = result.CreateTime.In(zone)
+		
+
 		results = append(results, &result)
-		fmt.Println(result)
+
 	}
 
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
-	// 遍歷結束後關閉遊標
+
 	cur.Close(ctx)
 	fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
-	//fmt.Println(results)
+
 	spew.Dump(results)
-	return results
+	return results, "success"
 }
 
 func UpdateToDoList(ctx iris.Context) string {
-	var TodoList models.HaveIDTodoList //需要用一个结构体来存放数据 并且结构体当中要有tag标签
-	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
+	var TodoList models.HaveIDTodoList
+
+	email := middleware.MyAuthenticatedHandler(ctx)
+	if email == "token not found" {
+		return "token not found"
+	}
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
 	id, _ := primitive.ObjectIDFromHex(TodoList.ID)
 
-	filter := bson.D{{Key: "_id",Value:id}}
+	filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: email}}
 
-	// 如果過濾的文件不存在，則插入新的文件
 	opts := options.Update().SetUpsert(true)
 	update := bson.D{
 		{Key: "$set", Value: bson.D{
 			{Key: "finishedCondition", Value: TodoList.FinishedCondition},
 			{Key: "note", Value: TodoList.Note},
-			{Key: "updateAt",Value:time.Now()},
+			{Key: "updateAt", Value: time.Now()},
 		},
 		}}
 	result, err := database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
 		log.Fatal(err)
-		return "修改失敗"
+		return "update failed"
 	}
 	if result.MatchedCount != 0 {
 		fmt.Printf("Matched %v documents and updated %v documents.\n", result.MatchedCount, result.ModifiedCount)
-		return "修改成功"
+		return "update success"
 	}
 	if result.UpsertedCount != 0 {
 		fmt.Printf("inserted a new document with ID %v\n", result.UpsertedID)
-		return "修改成功"
+		return "insert success"
 	}
 	fmt.Println(result)
-	return "修改失敗"
+	return "update failed"
 }
 
 func DeleteToDoList(ctx iris.Context) string {
-	var TodoList models.HaveIDTodoList//一个结构体来存放数据 并且结构体当中要有tag标签
-	//context.ReadJson() 里面传入的是结构体的指针类型 内存地址
+	var TodoList models.HaveIDTodoList
+	email := middleware.MyAuthenticatedHandler(ctx)
+	if email == "token not found" {
+		return "token not found"
+	}
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
 	fmt.Println(TodoList)
 	id, _ := primitive.ObjectIDFromHex(TodoList.ID)
 
-	filter := bson.D{{Key: "_id",Value:id}}
+	filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: email}}
 
 	deleteResult, err := database.TodolistCollection.DeleteOne(ctx, filter)
 	if err != nil {
@@ -148,5 +169,63 @@ func DeleteToDoList(ctx iris.Context) string {
 	fmt.Printf("Deleted %v documents in the trainers collection\n", deleteResult.DeletedCount)
 	result = "刪除" + result + "筆資料"
 	return result
+
+}
+
+func updateStatus(ctx iris.Context, email string) {
+	var results []*models.HaveIDTodoList
+
+	filter := bson.D{{Key: "email", Value: email}}
+
+	cur, err := database.TodolistCollection.Find(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for cur.Next(ctx) {
+
+		var result models.HaveIDTodoList
+		err := cur.Decode(&result)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		zone := time.FixedZone("", +8*60*60)
+		result.CreateTime = result.CreateTime.In(zone)
+		id, _ := primitive.ObjectIDFromHex(result.ID)
+		if result.EndTime.Before(time.Now()) {
+			filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: result.Email}}
+			opts := options.Update().SetUpsert(true)
+			update := bson.D{
+				{Key: "$set", Value: bson.D{
+					{Key: "status", Value: "未逾期"},
+				},
+				}}
+			database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
+
+		} else {
+			filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: result.Email}}
+			opts := options.Update().SetUpsert(true)
+			update := bson.D{
+				{Key: "$set", Value: bson.D{
+					{Key: "status", Value: "逾期"},
+				},
+				}}
+			database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
+
+		}
+
+		results = append(results, &result)
+
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(ctx)
+	fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
+
+	// spew.Dump(results)
+	// return results, "success"
 
 }

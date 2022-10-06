@@ -16,16 +16,26 @@ func CreateToDoList(ctx iris.Context) {
 
 }
 
+
+
 func GetToDoList(ctx iris.Context) {
-	result := service.GetOneToDoList(ctx)
+	result,str := service.GetOneToDoList(ctx)
 	fmt.Println(result)
-	ctx.JSON(result)
+	if str == "success"{
+		ctx.JSON(result)
+	}else{
+		ctx.JSON(str)
+	}
+	
 }
 
 func GetManyToDoList(ctx iris.Context) {
-	result := service.GetManyToDoList(ctx)
-	fmt.Println(result)
-	ctx.JSON(result)
+	result,str := service.GetManyToDoList(ctx)
+	if str == "success"{
+		ctx.JSON(result)
+	}else{
+		ctx.JSON(str)
+	}
 }
 
 func UpdateToDoList(ctx iris.Context) {
