@@ -12,29 +12,40 @@ func CreateToDoList(ctx iris.Context) {
 
 	result := service.CreateToDoList(ctx)
 	fmt.Println(result)
-	ctx.JSON(result)
+	if result ==1{
+		ctx.JSON("新增成功")
+	}else if result ==3{
+		ctx.JSON("tokenError")
+	}else{
+		ctx.JSON("error")
+	}
+
 
 }
 
 
 
 func GetToDoList(ctx iris.Context) {
-	result,str := service.GetOneToDoList(ctx)
+	result,num := service.GetOneToDoList(ctx)
 	fmt.Println(result)
-	if str == "success"{
+	if num == 1{
 		ctx.JSON(result)
+	}else if num == 3{
+		ctx.JSON("tokenError")
 	}else{
-		ctx.JSON(str)
+		ctx.JSON("error")
 	}
 	
 }
 
 func GetManyToDoList(ctx iris.Context) {
-	result,str := service.GetManyToDoList(ctx)
-	if str == "success"{
+	result,num := service.GetManyToDoList(ctx)
+	if num == 1{
 		ctx.JSON(result)
+	}else if num==3{
+		ctx.JSON("tokenError")
 	}else{
-		ctx.JSON(str)
+		ctx.JSON("error")
 	}
 }
 
@@ -46,5 +57,12 @@ func UpdateToDoList(ctx iris.Context) {
 
 func DeleteToDoList(ctx iris.Context) {
 	result := service.DeleteToDoList(ctx)
-	ctx.JSON(result)
+	if result ==1{
+		ctx.JSON("刪除成功")
+	}else if result ==3{
+		ctx.JSON("tokenError")
+	}else{
+		ctx.JSON("error")
+	}
+
 }

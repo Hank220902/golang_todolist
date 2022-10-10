@@ -13,7 +13,21 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Register(ctx iris.Context) string {
+
+func Register(ctx iris.Context) int {
+	var reqRegister models.Login
+	if err := ctx.ReadJSON(&reqRegister); err != nil {
+		panic(err.Error())
+	}
+	fmt.Println(reqRegister.Password)
+	email := reqRegister.Email
+	var resultRegister models.Login
+	filter := bson.D{{Key: "email", Value: email}}
+	err := database.UserCollection.FindOne(ctx, filter).Decode(&resultRegister)
+	if err != nil {
+		return 4
+	}
+
 	var user models.User
 	if err := ctx.ReadJSON(&user); err != nil {
 		panic(err.Error())
@@ -38,11 +52,10 @@ func Register(ctx iris.Context) string {
 	}
 
 	fmt.Println("Inserted a Single Document: ", insertOne.InsertedID)
-	return "註冊成功"
+	return 1
 }
 
 func Login(ctx iris.Context) string {
-
 	var reqLogin models.Login
 	if err := ctx.ReadJSON(&reqLogin); err != nil {
 		panic(err.Error())
@@ -50,20 +63,35 @@ func Login(ctx iris.Context) string {
 	fmt.Println(reqLogin.Password)
 	email := reqLogin.Email
 	password := reqLogin.Password
-	var resultLongin models.Login
+	var resultLogin models.Login
 	filter := bson.D{{Key: "email", Value: email}}
-	err := database.UserCollection.FindOne(ctx, filter).Decode(&resultLongin)
+	err := database.UserCollection.FindOne(ctx, filter).Decode(&resultLogin)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(email)
 
 	token := middleware.GetTokenHandler(email)
-	check := ComparePasswords(resultLongin.Password, password)
+	check := ComparePasswords(resultLogin.Password, password)
 	if !check {
 		return "帳號或密碼錯誤"
 	} else {
 		return token
 	}
 
+}
+
+func Logout(ctx iris.Context)int{
+	var Redis = database.Redis()
+	email := middleware.MyAuthenticatedHandler(ctx)
+	n, err := Redis.Exists(ctx, email).Result()
+	if err != nil {
+		panic(err)
+	}
+	if n > 0 {
+		n := Redis.Del(ctx, email)
+		fmt.Println(n.Result())
+		return 1
+	}
+	return 2
 }

@@ -3,12 +3,10 @@ package service
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 	"todolist/database"
 	"todolist/middleware"
 	"todolist/models"
-
 	"github.com/davecgh/go-spew/spew"
 	"github.com/kataras/iris/v12"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,10 +14,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func CreateToDoList(ctx iris.Context) string {
+const(
+	success int = 1
+	fail int =2
+	tokenError int = 3
+	emailExists int = 4
+)
+
+func CreateToDoList(ctx iris.Context) int {
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return "token not found"
+		return 3
 	}
 
 	var TodoList models.TodoList
@@ -45,16 +50,16 @@ func CreateToDoList(ctx iris.Context) string {
 	}
 
 	fmt.Println("Inserted a Single Document: ", insertOne.InsertedID)
-	return "success"
+	return 1
 
 }
 
-func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, string) {
+func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, int) {
 	var result models.HaveIDTodoList
 
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return result, "token not found"
+		return result, 3
 	}
 	fmt.Println(email)
 	filter := bson.D{{Key: "email", Value: email}}
@@ -63,15 +68,15 @@ func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, string) {
 		log.Fatal(err)
 	}
 	fmt.Printf("Found a single document: %+v\n", result)
-	return result, "success"
+	return result, 1
 }
 
-func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, string) {
+func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 
 	var results []*models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return results, "token not found"
+		return results, 3
 	}
 	updateStatus(ctx,email)
 	filter := bson.D{{Key: "email", Value: email}}
@@ -104,7 +109,7 @@ func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, string) {
 	fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
 
 	spew.Dump(results)
-	return results, "success"
+	return results, 1
 }
 
 func UpdateToDoList(ctx iris.Context) string {
@@ -121,7 +126,7 @@ func UpdateToDoList(ctx iris.Context) string {
 
 	filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: email}}
 
-	opts := options.Update().SetUpsert(true)
+	opts := options.Update().SetUpsert(false)
 	update := bson.D{
 		{Key: "$set", Value: bson.D{
 			{Key: "finishedCondition", Value: TodoList.FinishedCondition},
@@ -138,25 +143,23 @@ func UpdateToDoList(ctx iris.Context) string {
 		fmt.Printf("Matched %v documents and updated %v documents.\n", result.MatchedCount, result.ModifiedCount)
 		return "update success"
 	}
-	if result.UpsertedCount != 0 {
-		fmt.Printf("inserted a new document with ID %v\n", result.UpsertedID)
-		return "insert success"
-	}
+
 	fmt.Println(result)
 	return "update failed"
 }
 
-func DeleteToDoList(ctx iris.Context) string {
-	var TodoList models.HaveIDTodoList
+func DeleteToDoList(ctx iris.Context) int {
+	// var TodoList models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return "token not found"
+		return 3
 	}
-	if err := ctx.ReadJSON(&TodoList); err != nil {
-		panic(err.Error())
-	}
-	fmt.Println(TodoList)
-	id, _ := primitive.ObjectIDFromHex(TodoList.ID)
+
+
+    paramsId := ctx.URLParam("id")
+	fmt.Println(paramsId)
+
+	id, _ := primitive.ObjectIDFromHex(paramsId)
 
 	filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: email}}
 
@@ -164,11 +167,13 @@ func DeleteToDoList(ctx iris.Context) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	result := strconv.FormatInt(deleteResult.DeletedCount, 10)
+
 
 	fmt.Printf("Deleted %v documents in the trainers collection\n", deleteResult.DeletedCount)
-	result = "刪除" + result + "筆資料"
-	return result
+	if deleteResult.DeletedCount == 0 {
+		return 2
+	}
+	return 1
 
 }
 

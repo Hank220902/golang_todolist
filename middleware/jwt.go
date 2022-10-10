@@ -32,7 +32,7 @@ func GetTokenHandler(email string) string {
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"iat":   now.Unix(),
-		"exp":   now.Add(1440 * time.Minute).Unix(),
+		"exp":   now.Add(15 * time.Minute).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
