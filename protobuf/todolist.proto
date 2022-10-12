@@ -10,6 +10,9 @@ message CreateRequest {
   string matter = 1;
   string endTime = 2;
   string finishedCondition =3;
+  string status =4;
+  string createTime=5;
+  string email=6;
 }
 
 message CreateResponse {
@@ -44,7 +47,7 @@ message CreateResponse {
 // }
 
 service TodoListService {
-  rpc CreateTodolist(CreateRequest) returns (CreateResponse) {};
+  rpc CreateTodolist(CreateRequest) returns (CreateResponse);
   // rpc Get(GetRequest) returns (GetResponse) {};
   // rpc Update(UpdateRequest) returns (UpdateResponse) {};
   // rpc Delete(DeleteRequest) returns (DeleteResponse) {};

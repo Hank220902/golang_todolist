@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
-	"todolist/database"
+	"todolist/connect"
 	"todolist/models"
 	"todolist/middleware"
 	// "github.com/davecgh/go-spew/spew"
@@ -15,18 +15,6 @@ import (
 
 
 func Register(ctx iris.Context) int {
-	var reqRegister models.Login
-	if err := ctx.ReadJSON(&reqRegister); err != nil {
-		panic(err.Error())
-	}
-	fmt.Println(reqRegister.Password)
-	email := reqRegister.Email
-	var resultRegister models.Login
-	filter := bson.D{{Key: "email", Value: email}}
-	err := database.UserCollection.FindOne(ctx, filter).Decode(&resultRegister)
-	if err != nil {
-		return 4
-	}
 
 	var user models.User
 	if err := ctx.ReadJSON(&user); err != nil {
@@ -35,6 +23,9 @@ func Register(ctx iris.Context) int {
 
 	fmt.Println(user)
 
+	if haveEmail(ctx,user.Email)==4{
+		return 4
+	}
 	hashStr, err := HashAndSalt(user.Password)
 	if err != nil {
 		fmt.Println(err)
@@ -46,13 +37,27 @@ func Register(ctx iris.Context) int {
 		Password: hashStr,
 		Email:    user.Email,
 	}
-	insertOne, err := database.UserCollection.InsertOne(ctx, result)
+	insertOne, err := connect.UserCollection.InsertOne(ctx, result)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Inserted a Single Document: ", insertOne.InsertedID)
 	return 1
+}
+
+func haveEmail(ctx iris.Context, email string) int{
+	var reqLogin models.Login
+	fmt.Println(reqLogin.Password)
+
+	var resultLogin models.Login
+	filter := bson.D{{Key: "email", Value: email}}
+	err := connect.UserCollection.FindOne(ctx, filter).Decode(&resultLogin)
+	if err != nil {
+		return 1
+	}else{
+		return 4
+	}
 }
 
 func Login(ctx iris.Context) string {
@@ -62,10 +67,12 @@ func Login(ctx iris.Context) string {
 	}
 	fmt.Println(reqLogin.Password)
 	email := reqLogin.Email
+
+
 	password := reqLogin.Password
 	var resultLogin models.Login
 	filter := bson.D{{Key: "email", Value: email}}
-	err := database.UserCollection.FindOne(ctx, filter).Decode(&resultLogin)
+	err := connect.UserCollection.FindOne(ctx, filter).Decode(&resultLogin)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,7 +89,7 @@ func Login(ctx iris.Context) string {
 }
 
 func Logout(ctx iris.Context)int{
-	var Redis = database.Redis()
+	var Redis = connect.Redis()
 	email := middleware.MyAuthenticatedHandler(ctx)
 	n, err := Redis.Exists(ctx, email).Result()
 	if err != nil {

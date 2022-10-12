@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"todolist/database"
+	"todolist/connect"
 	"todolist/middleware"
 	"todolist/models"
 	"github.com/davecgh/go-spew/spew"
@@ -44,7 +44,7 @@ func CreateToDoList(ctx iris.Context) int {
 		Email:             email,
 		CreateTime:        createTime,
 	}
-	insertOne, err := database.TodolistCollection.InsertOne(ctx, result)
+	insertOne, err := connect.TodolistCollection.InsertOne(ctx, result)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, int) {
 	}
 	fmt.Println(email)
 	filter := bson.D{{Key: "email", Value: email}}
-	err := database.TodolistCollection.FindOne(ctx, filter).Decode(&result)
+	err := connect.TodolistCollection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 	updateStatus(ctx,email)
 	filter := bson.D{{Key: "email", Value: email}}
 
-	cur, err := database.TodolistCollection.Find(ctx, filter)
+	cur, err := connect.TodolistCollection.Find(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func UpdateToDoList(ctx iris.Context) string {
 			{Key: "updateAt", Value: time.Now()},
 		},
 		}}
-	result, err := database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
+	result, err := connect.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
 		log.Fatal(err)
 		return "update failed"
@@ -163,7 +163,7 @@ func DeleteToDoList(ctx iris.Context) int {
 
 	filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: email}}
 
-	deleteResult, err := database.TodolistCollection.DeleteOne(ctx, filter)
+	deleteResult, err := connect.TodolistCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func updateStatus(ctx iris.Context, email string) {
 
 	filter := bson.D{{Key: "email", Value: email}}
 
-	cur, err := database.TodolistCollection.Find(ctx, filter)
+	cur, err := connect.TodolistCollection.Find(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -197,7 +197,7 @@ func updateStatus(ctx iris.Context, email string) {
 		zone := time.FixedZone("", +8*60*60)
 		result.CreateTime = result.CreateTime.In(zone)
 		id, _ := primitive.ObjectIDFromHex(result.ID)
-		if result.EndTime.Before(time.Now()) {
+		if result.EndTime.After(time.Now()) {
 			filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: result.Email}}
 			opts := options.Update().SetUpsert(true)
 			update := bson.D{
@@ -205,7 +205,7 @@ func updateStatus(ctx iris.Context, email string) {
 					{Key: "status", Value: "未逾期"},
 				},
 				}}
-			database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
+			connect.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 
 		} else {
 			filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: result.Email}}
@@ -215,7 +215,7 @@ func updateStatus(ctx iris.Context, email string) {
 					{Key: "status", Value: "逾期"},
 				},
 				}}
-			database.TodolistCollection.UpdateOne(ctx, filter, update, opts)
+			connect.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 
 		}
 

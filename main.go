@@ -2,29 +2,36 @@
 package main
 
 import (
-    "todolist/routes"
-	"todolist/database"
-	"github.com/kataras/iris/v12"
-    // "todolist/middleware"
+	"fmt"
+	"todolist/cmd"
+	"todolist/connect"
+	"todolist/routes"
 
+	"github.com/kataras/iris/v12"
+	// "todolist/middleware"
 )
 
+
 func init() {
-    database.Connect()
-    database.Redis()
-}
+
+	connect.Connect()
+	connect.Redis()
+    // cmd.Client()
+    go cmd.Server()
     
+
+}
+
 func main() {
-    
-    app := iris.New()
-    
-    routes.TodoList(app)
-    routes.User(app)
-    app.Listen(":3000")
+   
+	app := iris.New()
+    fmt.Println("hello")
+
+	routes.TodoList(app)
+	routes.User(app)
+ 
+
+	app.Listen(":3000")
 
 
 }
-
-
-
-

@@ -1,14 +1,27 @@
 package routes
 
 import (
+	"log"
 	"todolist/controllers"
 	"todolist/middleware"
+	pb "todolist/protobuf"
 
 	"github.com/kataras/iris/v12"
+	"google.golang.org/grpc"
 )
 
-func TodoList(app *iris.Application) {
+var client pb.TodoListServiceClient
 
+func init() {
+	connect, err := grpc.Dial("127.0.0.1:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client = pb.NewTodoListServiceClient(connect)
+
+}
+
+func TodoList(app *iris.Application) {
 
 	api := app.Party("/api", middleware.J.Serve)
 	{
@@ -19,8 +32,22 @@ func TodoList(app *iris.Application) {
 		api.Delete("/todolist", controllers.DeleteToDoList)
 
 	}
+	grpc:=app.Party("/grpc",middleware.J.Serve)
+	{
+		grpc.Post("/", controllers.GrpcCreateToDoList)
+	}
+
 
 	app.Get("/", func(ctx iris.Context) {
 		ctx.JSON("Hello World")
 	})
 }
+
+// func test(ctx iris.Context) {
+// 	req := pb.CreateRequest{Matter: string("hello"), EndTime: string("10/10"), FinishedCondition: string("not")}
+// 	res, err := client.CreateTodolist(ctx, &req)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println(res.GetResMessage())
+// }

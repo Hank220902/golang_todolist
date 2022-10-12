@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"todolist/database"
+	"todolist/connect"
 
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris/v12"
@@ -26,7 +26,7 @@ var J = jwt.New(jwt.Config{
 
 // generate token to use.
 func GetTokenHandler(email string) string {
-	var Redis = database.Redis()
+	var Redis = connect.Redis()
 	ctx := context.Background()
 	now := time.Now()
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -61,7 +61,7 @@ func GetTokenHandler(email string) string {
 }
 
 func MyAuthenticatedHandler(ctx iris.Context) string {
-	var Redis = database.Redis()
+	var Redis = connect.Redis()
 	if err := J.CheckJWT(ctx); err != nil {
 		J.Config.ErrorHandler(ctx, err)
 
