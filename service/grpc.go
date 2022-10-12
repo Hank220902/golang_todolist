@@ -36,7 +36,6 @@ func GCreateToDoList(ctx iris.Context) int {
 
 	status := ""
 	createTime := time.Now()
-	fmt.Println(TodoList.EndTime)
 	req := pb.CreateRequest{
 		Matter:            string(TodoList.Matter),
 		EndTime:           string(TodoList.EndTime.String()),

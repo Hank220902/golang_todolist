@@ -24,11 +24,14 @@ type todoListService struct {
 
 func (ts *todoListService) CreateTodolist(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
 	// res := "recovide:" + req.GetMatter() + req.GetEndTime() + req.GetFinishedCondition()
-	layout:="2022-09-30 03:31:31.72"
-	endTime, error := time.Parse(layout, req.GetEndTime())
-	createTime, error := time.Parse(layout, req.GetCreateTime())
+	// layout:="2006-01-02T15:04:05.000Z"
+	// result, err = time.Parse(time.RFC3339, in)
+	endTime, error := time.Parse(time.RFC3339, req.GetEndTime())
+	createTime, error := time.Parse(time.RFC3339, req.GetCreateTime())
 	fmt.Println(req.GetEndTime())
 	fmt.Println(endTime)
+	fmt.Println(req.GetCreateTime())
+	fmt.Println(createTime)
 
 	if error != nil {
 		fmt.Println(error)
