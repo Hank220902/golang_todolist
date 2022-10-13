@@ -52,8 +52,28 @@ func GCreateToDoList(ctx iris.Context) int32 {
 	return res.GetResMessage()
 
 }
+func GGetFilterTodoList(ctx iris.Context)(*pb.GetFilterResponse,int){
+	email := middleware.MyAuthenticatedHandler(ctx)
+	if email == "token not found" {
+		return nil,3
+	}
+	paramsStatus := ctx.URLParam("status")
+	paramsFinishedCondition := ctx.URLParam("finishedCondition")
+	updateStatus(ctx,email)
+	req :=pb.GetFilterRequest{
+		Email: email,
+		Status:paramsStatus,
+		FinishedCondition:paramsFinishedCondition,
+	}
+	res,err :=client.GetFilterTodolist(ctx,&req)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(res)
+	return res,1
+}
 
-func GGetManyToDoList(ctx iris.Context)(*pb.GetResponse, int){
+func GGetAllToDoList(ctx iris.Context)(*pb.GetResponse, int){
 
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
@@ -63,7 +83,7 @@ func GGetManyToDoList(ctx iris.Context)(*pb.GetResponse, int){
 	req :=pb.GetRequest{
 		Email: email,
 	}
-	res,err :=client.GetManyTodolist(ctx,&req)
+	res,err :=client.GetAllTodolist(ctx,&req)
 	if err != nil {
 		panic(err)
 	}

@@ -45,6 +45,42 @@ func (ts *todoListService) CreateTodolist(ctx context.Context, req *pb.CreateReq
 	return &pb.CreateResponse{ResMessage: 1}, nil
 }
 
+func (ts *todoListService)GetFilterTodolist(ctx context.Context,req *pb.GetFilterRequest) (*pb.GetFilterResponse, error) {
+	var results []*models.HaveIDTodoList
+	filter := bson.D{{Key: "email", Value: req.GetEmail()}}
+	if req.GetStatus() != "" && req.GetFinishedCondition() != ""{
+		filter =bson.D{{Key: "email", Value: req.GetEmail()},{Key: "status", Value: req.GetStatus()},{Key: "finishedCondition", Value: req.GetFinishedCondition()}}
+	}else if req.GetStatus() != ""{
+		filter =bson.D{{Key: "email", Value: req.GetEmail()},{Key: "status", Value: req.GetStatus()}}
+	}else if req.GetFinishedCondition() != ""{
+		filter =bson.D{{Key: "email", Value: req.GetEmail()},{Key: "finishedCondition", Value: req.GetFinishedCondition()}}
+	}
+	cur, err := connect.TodolistCollection.Find(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for cur.Next(ctx) {
+
+		var result models.HaveIDTodoList
+		err := cur.Decode(&result)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		zone := time.FixedZone("", +8*60*60)
+		result.CreateTime = result.CreateTime.In(zone)
+
+		results = append(results, &result)
+
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	cur.Close(ctx)
+	return &pb.GetFilterResponse{GetResult: convertGetToDoListsToPb(results)}, nil
+}
+
 func (ts *todoListService) GetAllTodolist(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
 	var results []*models.HaveIDTodoList
 	filter := bson.D{{Key: "email", Value: req.GetEmail()}}

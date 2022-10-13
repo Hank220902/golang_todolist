@@ -1,0 +1,37 @@
+syntax = "proto3";  // 定義要使用的 protocol buffer 版本
+
+package protobuf;
+
+message LoginRequest{
+
+    string email=1;
+    string password=2;
+}
+
+message LoginResponse{
+    int32 resMessage =1;
+}
+
+message RegisterRequest{
+    string name=1;
+    string email=2;
+    string password=3;
+}
+
+message RegisterResponse{
+    string resMessage=1;
+}
+
+message LogoutRequest{
+    string email=1;
+}
+
+message LogoutResponse{
+    string resMessage=1;
+}
+
+service UserService{
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc Logout(LogoutRequest) returns (LogoutResponse);
+}

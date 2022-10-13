@@ -18,8 +18,20 @@ func GrpcCreateToDoList(ctx iris.Context) {
 	}
 }
 
-func GrpcGetManyToDoList(ctx iris.Context){
-	result,num := service.GGetManyToDoList(ctx)
+func GrpcGetFilterToDoList(ctx iris.Context) {
+	result,num := service.GGetFilterTodoList(ctx)
+	fmt.Println(result)
+	if num == 1{
+		ctx.JSON(result.GetResult)
+	}else if num == 3{
+		ctx.JSON("tokenError")
+	}else{
+		ctx.JSON("error")
+	}
+}
+
+func GrpcGetAllToDoList(ctx iris.Context){
+	result,num := service.GGetAllToDoList(ctx)
 	fmt.Println(result)
 	if num == 1{
 		ctx.JSON(result.GetResult)

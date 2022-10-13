@@ -35,9 +35,10 @@ func TodoList(app *iris.Application) {
 	grpc:=app.Party("/grpc",middleware.J.Serve)
 	{
 		grpc.Post("/todolist", controllers.GrpcCreateToDoList)
-		grpc.Get("/manytodolist", controllers.GrpcGetManyToDoList)
+		grpc.Get("/manytodolist", controllers.GrpcGetAllToDoList)
 		grpc.Put("/todolist", controllers.GrpcUpdateToDoList)
 		grpc.Delete("/todolist", controllers.GrpcDeleteToDoList)
+		grpc.Get("/filtertodolist", controllers.GrpcGetFilterToDoList)
 	}
 
 

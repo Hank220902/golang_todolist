@@ -21,6 +21,8 @@ message CreateResponse {
 
 message GetFilterRequest{
   string email=1;
+  string status=2;
+  string finishedCondition =3;
 
 }
 message GetFilterResponse {
