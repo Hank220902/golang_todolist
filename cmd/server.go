@@ -45,7 +45,7 @@ func (ts *todoListService) CreateTodolist(ctx context.Context, req *pb.CreateReq
 	return &pb.CreateResponse{ResMessage: 1}, nil
 }
 
-func (ts *todoListService) GetManyTodolist(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
+func (ts *todoListService) GetAllTodolist(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
 	var results []*models.HaveIDTodoList
 	filter := bson.D{{Key: "email", Value: req.GetEmail()}}
 

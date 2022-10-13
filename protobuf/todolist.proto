@@ -19,6 +19,14 @@ message CreateResponse {
     int32 resMessage =1;
 }
 
+message GetFilterRequest{
+  string email=1;
+
+}
+message GetFilterResponse {
+  repeated GetResult GetResult=1;
+}
+
 message GetRequest {
   string email=1;
 }
@@ -62,7 +70,8 @@ message DeleteResponse {
 
 service TodoListService {
   rpc CreateTodolist(CreateRequest) returns (CreateResponse);
-  rpc GetManyTodolist(GetRequest) returns (GetResponse);
+  rpc GetAllTodolist(GetRequest) returns (GetResponse);
   rpc UpdateTodolist(UpdateRequest) returns (UpdateResponse);
   rpc DeleteTodolist(DeleteRequest) returns (DeleteResponse);
+  rpc GetFilterTodolist(GetFilterRequest) returns (GetFilterResponse);
 }

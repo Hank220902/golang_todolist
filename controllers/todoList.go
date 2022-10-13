@@ -23,8 +23,8 @@ func CreateToDoList(ctx iris.Context) {
 
 }
 
-func GetToDoList(ctx iris.Context) {
-	result, num := service.GetOneToDoList(ctx)
+func GetFilterToDoList(ctx iris.Context) {
+	result, num := service.GetFilterToDoList(ctx)
 	fmt.Println(result)
 	if num == 1 {
 		ctx.JSON(result)

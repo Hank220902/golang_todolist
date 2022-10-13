@@ -25,7 +25,7 @@ func TodoList(app *iris.Application) {
 
 	api := app.Party("/api", middleware.J.Serve)
 	{
-		api.Get("/todolist", controllers.GetToDoList)
+		api.Get("/todolist", controllers.GetFilterToDoList)
 		api.Post("/todolist", controllers.CreateToDoList)
 		api.Get("/manytodolist", controllers.GetAllToDoList)
 		api.Put("/todolist", controllers.UpdateToDoList)

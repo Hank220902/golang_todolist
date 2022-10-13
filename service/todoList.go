@@ -54,7 +54,7 @@ func CreateToDoList(ctx iris.Context) int {
 
 }
 
-func GetOneToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
+func GetFilterToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 
 	var results []*models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
