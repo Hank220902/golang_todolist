@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+
 	"todolist/service"
 
 	"github.com/kataras/iris/v12"
@@ -12,39 +13,36 @@ func CreateToDoList(ctx iris.Context) {
 
 	result := service.CreateToDoList(ctx)
 	fmt.Println(result)
-	if result ==1{
+	if result == 1 {
 		ctx.JSON("新增成功")
-	}else if result ==3{
+	} else if result == 3 {
 		ctx.JSON("tokenError")
-	}else{
+	} else {
 		ctx.JSON("error")
 	}
 
-
 }
-
-
 
 func GetToDoList(ctx iris.Context) {
-	result,num := service.GetOneToDoList(ctx)
+	result, num := service.GetOneToDoList(ctx)
 	fmt.Println(result)
-	if num == 1{
+	if num == 1 {
 		ctx.JSON(result)
-	}else if num == 3{
+	} else if num == 3 {
 		ctx.JSON("tokenError")
-	}else{
+	} else {
 		ctx.JSON("error")
 	}
-	
+
 }
 
-func GetManyToDoList(ctx iris.Context) {
-	result,num := service.GetManyToDoList(ctx)
-	if num == 1{
+func GetAllToDoList(ctx iris.Context) {
+	result, num := service.GetAllToDoList(ctx)
+	if num == 1 {
 		ctx.JSON(result)
-	}else if num==3{
+	} else if num == 3 {
 		ctx.JSON("tokenError")
-	}else{
+	} else {
 		ctx.JSON("error")
 	}
 }
@@ -57,11 +55,11 @@ func UpdateToDoList(ctx iris.Context) {
 
 func DeleteToDoList(ctx iris.Context) {
 	result := service.DeleteToDoList(ctx)
-	if result ==1{
-		ctx.JSON("刪除成功")
-	}else if result ==3{
+	if result == 1 {
+		ctx.JSON("success")
+	} else if result == 3 {
 		ctx.JSON("tokenError")
-	}else{
+	} else {
 		ctx.JSON("error")
 	}
 

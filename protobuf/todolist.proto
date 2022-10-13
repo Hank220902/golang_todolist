@@ -3,7 +3,7 @@ syntax = "proto3";  // 定義要使用的 protocol buffer 版本
 package protobuf;  // for name space
 //option go_package = "proto/todolist";  // generated code 的 full Go import path
 //import "google/protobuf/timestamp.proto";
-// import "google/protobuf/any.proto";
+
 
 
 message CreateRequest {
@@ -16,39 +16,53 @@ message CreateRequest {
 }
 
 message CreateResponse {
-    string resMessage =1;
+    int32 resMessage =1;
 }
 
-// message GetRequest {
+message GetRequest {
+  string email=1;
+}
 
-// }
+message GetResponse {
+  repeated GetResult GetResult=1;
+}
 
-// message GetResponse {
-//   google.protobuf.Any resMessage =1;
-// }
+message GetResult{
+  string id=1;
+  string matter=2;
+  string endTime=3;
+  string finishedCondition=4;
+  string status=5;
+  string email=6;
+  string note =7;
+  string createTime=8;
+  string updateTime=9;
+}
 
-// message UpdateRequest {
-//     string id = 1;
-//     string finishedCondition = 2;
-//     string note = 3;
-// }  
+message UpdateRequest {
+    string id = 1;
+    string finishedCondition = 2;
+    string note = 3;
+    string email = 4;
+}  
 
-// message UpdateResponse {
-//     string resMessage =1;
+message UpdateResponse {
+    int32 resMessage =1;
 
-// }
+}
 
-// message DeleteRequest {
-//   string id = 1;
-// }
+message DeleteRequest {
+  string id = 1;
+  string email=2;
+}
 
-// message DeleteResponse {
-//     string resMessage =1;
-// }
+message DeleteResponse {
+    int32 resMessage =1;
+}
 
 service TodoListService {
   rpc CreateTodolist(CreateRequest) returns (CreateResponse);
-  // rpc Get(GetRequest) returns (GetResponse) {};
-  // rpc Update(UpdateRequest) returns (UpdateResponse) {};
-  // rpc Delete(DeleteRequest) returns (DeleteResponse) {};
+  rpc GetManyTodolist(GetRequest) returns (GetResponse);
+  rpc UpdateTodolist(UpdateRequest) returns (UpdateResponse);
+  rpc DeleteTodolist(DeleteRequest) returns (DeleteResponse);
 }

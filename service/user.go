@@ -81,7 +81,7 @@ func Login(ctx iris.Context) string {
 	token := middleware.GetTokenHandler(email)
 	check := ComparePasswords(resultLogin.Password, password)
 	if !check {
-		return "帳號或密碼錯誤"
+		return "fail"
 	} else {
 		return token
 	}

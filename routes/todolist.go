@@ -27,14 +27,17 @@ func TodoList(app *iris.Application) {
 	{
 		api.Get("/todolist", controllers.GetToDoList)
 		api.Post("/todolist", controllers.CreateToDoList)
-		api.Get("/manytodolist", controllers.GetManyToDoList)
+		api.Get("/manytodolist", controllers.GetAllToDoList)
 		api.Put("/todolist", controllers.UpdateToDoList)
 		api.Delete("/todolist", controllers.DeleteToDoList)
 
 	}
 	grpc:=app.Party("/grpc",middleware.J.Serve)
 	{
-		grpc.Post("/", controllers.GrpcCreateToDoList)
+		grpc.Post("/todolist", controllers.GrpcCreateToDoList)
+		grpc.Get("/manytodolist", controllers.GrpcGetManyToDoList)
+		grpc.Put("/todolist", controllers.GrpcUpdateToDoList)
+		grpc.Delete("/todolist", controllers.GrpcDeleteToDoList)
 	}
 
 
@@ -44,7 +47,7 @@ func TodoList(app *iris.Application) {
 }
 
 // func test(ctx iris.Context) {
-// 	req := pb.CreateRequest{Matter: string("hello"), EndTime: string("10/10"), FinishedCondition: string("not")}
+	// req := pb.CreateRequest{Matter: string("hello"), EndTime: string("10/10"), FinishedCondition: string("not")}
 // 	res, err := client.CreateTodolist(ctx, &req)
 // 	if err != nil {
 // 		panic(err)

@@ -54,24 +54,61 @@ func CreateToDoList(ctx iris.Context) int {
 
 }
 
-func GetOneToDoList(ctx iris.Context) (models.HaveIDTodoList, int) {
-	var result models.HaveIDTodoList
+func GetOneToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 
+	var results []*models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return result, 3
+		return results, 3
 	}
-	fmt.Println(email)
+	paramsStatus := ctx.URLParam("status")
+	paramsFinishedCondition := ctx.URLParam("finishedCondition")
 	filter := bson.D{{Key: "email", Value: email}}
-	err := connect.TodolistCollection.FindOne(ctx, filter).Decode(&result)
+	if paramsStatus != "" && paramsFinishedCondition != ""{
+		filter =bson.D{{Key: "email", Value: email},{Key: "status", Value: paramsStatus},{Key: "finishedCondition", Value: paramsFinishedCondition}}
+	}else if paramsStatus != ""{
+		filter =bson.D{{Key: "email", Value: email},{Key: "status", Value: paramsStatus}}
+	}else if paramsFinishedCondition != ""{
+		filter =bson.D{{Key: "email", Value: email},{Key: "finishedCondition", Value: paramsFinishedCondition}}
+	}
+	
+
+	updateStatus(ctx,email)
+	
+
+	cur, err := connect.TodolistCollection.Find(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Found a single document: %+v\n", result)
-	return result, 1
+	for cur.Next(ctx) {
+
+		var result models.HaveIDTodoList
+		err := cur.Decode(&result)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		zone := time.FixedZone("", +8*60*60)
+		result.CreateTime = result.CreateTime.In(zone)
+		
+
+		results = append(results, &result)
+
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(ctx)
+	fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
+
+	fmt.Println(results)
+	spew.Dump(results)
+	return results, 1
 }
 
-func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
+func GetAllToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 
 	var results []*models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
@@ -108,16 +145,17 @@ func GetManyToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 	cur.Close(ctx)
 	fmt.Printf("Found multiple documents (array of pointers): %+v\n", results)
 
+	fmt.Println(results)
 	spew.Dump(results)
 	return results, 1
 }
 
-func UpdateToDoList(ctx iris.Context) string {
+func UpdateToDoList(ctx iris.Context) int {
 	var TodoList models.HaveIDTodoList
 
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return "token not found"
+		return 3
 	}
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
@@ -131,21 +169,21 @@ func UpdateToDoList(ctx iris.Context) string {
 		{Key: "$set", Value: bson.D{
 			{Key: "finishedCondition", Value: TodoList.FinishedCondition},
 			{Key: "note", Value: TodoList.Note},
-			{Key: "updateAt", Value: time.Now()},
+			{Key: "updateTime", Value: time.Now()},
 		},
 		}}
 	result, err := connect.TodolistCollection.UpdateOne(ctx, filter, update, opts)
 	if err != nil {
 		log.Fatal(err)
-		return "update failed"
+		return 2
 	}
 	if result.MatchedCount != 0 {
 		fmt.Printf("Matched %v documents and updated %v documents.\n", result.MatchedCount, result.ModifiedCount)
-		return "update success"
+		return 1
 	}
 
 	fmt.Println(result)
-	return "update failed"
+	return 2
 }
 
 func DeleteToDoList(ctx iris.Context) int {
