@@ -14,4 +14,14 @@ func User(app *iris.Application) {
 	{
 		user.Get("", controllers.Logout)
 	}
+	
+	grpc:=app.Party("/grpc")
+	{
+		grpc.Post("/register",controllers.GrpcRegister)
+		grpc.Post("/login",controllers.GrpcLogin)
+	}
+	grpcUser :=app.Party("/gepc",middleware.J.Serve)
+	{
+		grpcUser.Get("/logout",controllers.GrpcLogout)
+	}
 }

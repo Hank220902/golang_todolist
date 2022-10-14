@@ -18,6 +18,7 @@ func init() {
 	connect.Redis()
     // cmd.Client()
     go cmd.Server()
+
     
 
 }

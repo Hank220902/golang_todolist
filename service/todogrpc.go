@@ -19,7 +19,6 @@ func init() {
 		log.Fatalln(err)
 	}
 	client = pb.NewTodoListServiceClient(connect)
-
 }
 
 func GCreateToDoList(ctx iris.Context) int32 {
@@ -42,7 +41,7 @@ func GCreateToDoList(ctx iris.Context) int32 {
 		EndTime:           TodoList.EndTime,
 		FinishedCondition: TodoList.FinishedCondition,
 		Status:            status,
-		Email:            email,
+		Email:             email,
 	}
 	res, err := client.CreateTodolist(ctx, &req)
 	if err != nil {
@@ -52,46 +51,46 @@ func GCreateToDoList(ctx iris.Context) int32 {
 	return res.GetResMessage()
 
 }
-func GGetFilterTodoList(ctx iris.Context)(*pb.GetFilterResponse,int){
+func GGetFilterTodoList(ctx iris.Context) (*pb.GetFilterResponse, int) {
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return nil,3
+		return nil, 3
 	}
 	paramsStatus := ctx.URLParam("status")
 	paramsFinishedCondition := ctx.URLParam("finishedCondition")
-	updateStatus(ctx,email)
-	req :=pb.GetFilterRequest{
-		Email: email,
-		Status:paramsStatus,
-		FinishedCondition:paramsFinishedCondition,
+	updateStatus(ctx, email)
+	req := pb.GetFilterRequest{
+		Email:             email,
+		Status:            paramsStatus,
+		FinishedCondition: paramsFinishedCondition,
 	}
-	res,err :=client.GetFilterTodolist(ctx,&req)
+	res, err := client.GetFilterTodolist(ctx, &req)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(res)
-	return res,1
+	return res, 1
 }
 
-func GGetAllToDoList(ctx iris.Context)(*pb.GetResponse, int){
+func GGetAllToDoList(ctx iris.Context) (*pb.GetResponse, int) {
 
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
-		return nil,3
+		return nil, 3
 	}
-	updateStatus(ctx,email)
-	req :=pb.GetRequest{
+	updateStatus(ctx, email)
+	req := pb.GetRequest{
 		Email: email,
 	}
-	res,err :=client.GetAllTodolist(ctx,&req)
+	res, err := client.GetAllTodolist(ctx, &req)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(res)
-	return res,1
+	return res, 1
 }
 
-func GUpdateToDoList(ctx iris.Context)int32{
+func GUpdateToDoList(ctx iris.Context) int32 {
 	var TodoList models.HaveIDTodoList
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
@@ -100,13 +99,13 @@ func GUpdateToDoList(ctx iris.Context)int32{
 	if err := ctx.ReadJSON(&TodoList); err != nil {
 		panic(err.Error())
 	}
-	req :=pb.UpdateRequest{
-		Id: TodoList.ID,
+	req := pb.UpdateRequest{
+		Id:                TodoList.ID,
 		FinishedCondition: TodoList.FinishedCondition,
-		Note:TodoList.Note,
-		Email: email,
+		Note:              TodoList.Note,
+		Email:             email,
 	}
-	res,err :=client.UpdateTodolist(ctx,&req) 
+	res, err := client.UpdateTodolist(ctx, &req)
 	if err != nil {
 		panic(err)
 	}
@@ -114,20 +113,19 @@ func GUpdateToDoList(ctx iris.Context)int32{
 	return res.ResMessage
 }
 
-func GDeleteToDoList(ctx iris.Context)int32{
+func GDeleteToDoList(ctx iris.Context) int32 {
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
 		return 3
 	}
 
-
-    paramsId := ctx.URLParam("id")
+	paramsId := ctx.URLParam("id")
 	fmt.Println(paramsId)
-	req:=pb.DeleteRequest{
-		Id: paramsId,
+	req := pb.DeleteRequest{
+		Id:    paramsId,
 		Email: email,
 	}
-	res,err := client.DeleteTodolist(ctx,&req)
+	res, err := client.DeleteTodolist(ctx, &req)
 	if err != nil {
 		panic(err)
 	}

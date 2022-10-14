@@ -9,7 +9,7 @@ message LoginRequest{
 }
 
 message LoginResponse{
-    int32 resMessage =1;
+    string resMessage =1;
 }
 
 message RegisterRequest{
@@ -19,7 +19,7 @@ message RegisterRequest{
 }
 
 message RegisterResponse{
-    string resMessage=1;
+    int32 resMessage=1;
 }
 
 message LogoutRequest{
@@ -27,7 +27,7 @@ message LogoutRequest{
 }
 
 message LogoutResponse{
-    string resMessage=1;
+    int32 resMessage=1;
 }
 
 service UserService{

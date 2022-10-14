@@ -14,7 +14,7 @@ func CreateToDoList(ctx iris.Context) {
 	result := service.CreateToDoList(ctx)
 	fmt.Println(result)
 	if result == 1 {
-		ctx.JSON("新增成功")
+		ctx.JSON("success")
 	} else if result == 3 {
 		ctx.JSON("tokenError")
 	} else {

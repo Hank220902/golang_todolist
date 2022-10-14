@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+
 // type EchoServiceServer interface {
 // 	// Unary
 // 	SayHello(context.Context, *EchoRequest) (*EchoResponse, error)
@@ -185,6 +186,7 @@ func (ts *todoListService) DeleteTodolist(ctx context.Context, req *pb.DeleteReq
 func Server() {
 	rpcs := grpc.NewServer()
 	pb.RegisterTodoListServiceServer(rpcs, new(todoListService))
+	pb.RegisterUserServiceServer(rpcs, new(userService))
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		panic(err)

@@ -17,7 +17,7 @@ var J = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 		return mySecret, nil
 	},
-	Expiration: true,
+	Expiration: false,
 
 	Extractor: jwt.FromAuthHeader,
 
@@ -28,11 +28,10 @@ var J = jwt.New(jwt.Config{
 func GetTokenHandler(email string) string {
 	var Redis = connect.Redis()
 	ctx := context.Background()
-	now := time.Now()
+
 	token := jwt.NewTokenWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
-		"iat":   now.Unix(),
-		"exp":   now.Add(15 * time.Minute).Unix(),
+
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
