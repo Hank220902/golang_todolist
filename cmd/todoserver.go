@@ -47,7 +47,7 @@ func (ts *todoListService) CreateTodolist(ctx context.Context, req *pb.CreateReq
 }
 
 func (ts *todoListService)GetFilterTodolist(ctx context.Context,req *pb.GetFilterRequest) (*pb.GetFilterResponse, error) {
-	var results []*models.HaveIDTodoList
+	var results []*models.HaveIDTodoListForMongo
 	filter := bson.D{{Key: "email", Value: req.GetEmail()}}
 	if req.GetStatus() != "" && req.GetFinishedCondition() != ""{
 		filter =bson.D{{Key: "email", Value: req.GetEmail()},{Key: "status", Value: req.GetStatus()},{Key: "finishedCondition", Value: req.GetFinishedCondition()}}
@@ -62,7 +62,7 @@ func (ts *todoListService)GetFilterTodolist(ctx context.Context,req *pb.GetFilte
 	}
 	for cur.Next(ctx) {
 
-		var result models.HaveIDTodoList
+		var result models.HaveIDTodoListForMongo
 		err := cur.Decode(&result)
 
 		if err != nil {
@@ -83,7 +83,7 @@ func (ts *todoListService)GetFilterTodolist(ctx context.Context,req *pb.GetFilte
 }
 
 func (ts *todoListService) GetAllTodolist(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
-	var results []*models.HaveIDTodoList
+	var results []*models.HaveIDTodoListForMongo
 	filter := bson.D{{Key: "email", Value: req.GetEmail()}}
 
 	cur, err := connect.TodolistCollection.Find(ctx, filter)
@@ -92,7 +92,7 @@ func (ts *todoListService) GetAllTodolist(ctx context.Context, req *pb.GetReques
 	}
 	for cur.Next(ctx) {
 
-		var result models.HaveIDTodoList
+		var result models.HaveIDTodoListForMongo
 		err := cur.Decode(&result)
 
 		if err != nil {
@@ -112,7 +112,7 @@ func (ts *todoListService) GetAllTodolist(ctx context.Context, req *pb.GetReques
 	return &pb.GetResponse{GetResult: convertGetToDoListsToPb(results)}, nil
 }
 
-func convertGetToDoListsToPb(in []*models.HaveIDTodoList) []*pb.GetResult {
+func convertGetToDoListsToPb(in []*models.HaveIDTodoListForMongo) []*pb.GetResult {
 	ans := make([]*pb.GetResult, len(in))
 	for i, v := range in {
 		ans[i] = convertGetToDoListToPb(v)
@@ -121,7 +121,7 @@ func convertGetToDoListsToPb(in []*models.HaveIDTodoList) []*pb.GetResult {
 	return ans
 }
 
-func convertGetToDoListToPb(in *models.HaveIDTodoList) *pb.GetResult {
+func convertGetToDoListToPb(in *models.HaveIDTodoListForMongo) *pb.GetResult {
 	if in == nil {
 		return new(pb.GetResult)
 	}

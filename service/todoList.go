@@ -54,9 +54,9 @@ func CreateToDoList(ctx iris.Context) int {
 
 }
 
-func GetFilterToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
+func GetFilterToDoList(ctx iris.Context) ([]*models.HaveIDTodoListForMongo, int) {
 
-	var results []*models.HaveIDTodoList
+	var results []*models.HaveIDTodoListForMongo
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
 		return results, 3
@@ -82,7 +82,7 @@ func GetFilterToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 	}
 	for cur.Next(ctx) {
 
-		var result models.HaveIDTodoList
+		var result models.HaveIDTodoListForMongo
 		err := cur.Decode(&result)
 
 		if err != nil {
@@ -108,9 +108,9 @@ func GetFilterToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 	return results, 1
 }
 
-func GetAllToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
+func GetAllToDoList(ctx iris.Context) ([]*models.HaveIDTodoListForMongo, int) {
 
-	var results []*models.HaveIDTodoList
+	var results []*models.HaveIDTodoListForMongo
 	email := middleware.MyAuthenticatedHandler(ctx)
 	if email == "token not found" {
 		return results, 3
@@ -124,7 +124,7 @@ func GetAllToDoList(ctx iris.Context) ([]*models.HaveIDTodoList, int) {
 	}
 	for cur.Next(ctx) {
 
-		var result models.HaveIDTodoList
+		var result models.HaveIDTodoListForMongo
 		err := cur.Decode(&result)
 
 		if err != nil {
