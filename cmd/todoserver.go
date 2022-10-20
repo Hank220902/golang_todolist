@@ -134,7 +134,7 @@ func convertGetToDoListToPb(in *models.HaveIDTodoListForMongo) *pb.GetResult {
 		Status:            in.Status,
 		Note:              in.Note,
 		Email:             in.Email,
-		UpdateTime:        in.UpeateTime.String(),
+		UpdateTime:        in.UpdateTime.String(),
 	}
 }
 

@@ -247,7 +247,7 @@ func updateStatus(ctx iris.Context, email string) {
 
 		} else {
 			filter := bson.D{{Key: "_id", Value: id}, {Key: "email", Value: result.Email}}
-			opts := options.Update().SetUpsert(true)
+			opts := options.Update().SetUpsert(false)
 			update := bson.D{
 				{Key: "$set", Value: bson.D{
 					{Key: "status", Value: "逾期"},

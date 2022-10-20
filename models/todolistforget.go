@@ -11,5 +11,5 @@ type HaveIDTodoListForMongo struct {
 	Email             string    `json:"email" bson:"email"`
 	Note              string    `json:"note" bson:"note"`
 	CreateTime        time.Time `json:"createTime" bson:"createTime"`
-	UpeateTime        time.Time `json:"updateTime" bson:"updateTime"`
+	UpdateTime        time.Time `json:"updateTime" bson:"updateTime"`
 }
